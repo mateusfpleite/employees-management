@@ -2,8 +2,10 @@
 
 one:
   name: MyString
+  role: MyString
   document: MyString
 
 two:
   name: MyString
+  role: MyString
   document: MyString
