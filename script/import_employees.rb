@@ -24,7 +24,7 @@ def row_to_employee(row, file_path)
   row.each do |header, value|
     case header
     when "NOME"
-      employee["name"] = value.strip
+      employee["name"] = value.strip.upcase
     when "DOC."
       employee["document"] = value ? value.gsub(/[^0-9]/, '').strip : nil
     when "FUNÇÃO"
@@ -61,7 +61,7 @@ Dir.glob("#{folder_path}/*.csv").each do |file_path|
   all_employees += employees
 end
 
-unique_employees = all_employees.uniq { |employee| [ employee["name"], employee["document"] ] }
+unique_employees = all_employees.uniq { |employee| [ employee["name"].downcase, employee["document"] ] }
 
 
 # add employees to database using the Employee model
