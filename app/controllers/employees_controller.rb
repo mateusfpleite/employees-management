@@ -3,8 +3,20 @@ class EmployeesController < ApplicationController
 
   # GET /employees or /employees.json
   def index
-    @employees = Employee.all
+    if params[:search] && params[:search][:name].present?
+      name_to_lower = remove_special_characters(params[:search][:name].downcase)
+      @employees = Employee.where("unaccent(LOWER(name)) LIKE ?", "%#{name_to_lower}%")
+    else
+      @employees = Employee.all
+    end
   end
+
+  def remove_special_characters(string)
+    string_without_accents = I18n.transliterate(string).strip;
+    # string_without_accents.gsub(/[^0-9a-z ]/i, '').strip
+    string_without_accents
+  end
+
 
   # GET /employees/1 or /employees/1.json
   def show

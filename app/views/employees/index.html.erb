@@ -1,16 +1,47 @@
 <p style="color: green"><%= notice %></p>
 
-<% content_for :title, "Colaboradores" %>
+<% content_for :title, "Funcionários" %>
 
-<h1>Colaboradores</h1>
+<h1 class="font-extrabold text-2xl">Funcionários</h1>
 
-<  id="employees">
-  <% @employees.each do |employee| %>
-    <%= render employee %>
-    <p>
-      <%= link_to "Ver esse colaborador", employee %>
-    </p>
-  <% end %>
-</div>
+<%= simple_form_for :search, url: employees_path, method: :get, html: { class: 'mb-4' } do |f| %>
+  <div class="flex items-end">
+    <%= f.input :name, label: 'Buscar por Nome', placeholder: 'Digite o nome do colaborador', input_html: { value: params[:search]&.dig(:name), class: 'form-input w-full' } %>
+    <%= f.button :submit, 'Buscar', class: 'cursor-pointer ml-2 px-4 py-2 bg-blue-500 text-white rounded' %>
+    <%= link_to 'Limpar', employees_path, class: 'ml-2 px-4 py-2 bg-gray-300 text-black rounded' %>
+  </div>
+<% end %>
+
+
+<table id="employees" class="table table-auto">
+  <thead>
+    <tr>
+      <th class="text-left">Nome</th>
+      <th class="text-left">Cargo</th>
+      <th class="text-left">Documento</th>
+      <th class="text-left">Arquivo</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @employees.each do |employee| %>
+      <tr class="mb-3">
+        <td class="p-2"><%= employee.name %></td>
+        <td class="p-2">
+          <% employee.role.each do |role|  %>
+            <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded mr-1"><%= role %></span>
+          <% end %>
+        </td>
+        <td class="p-2"><%= employee.document %></td>
+        <td class="p-2"><%= employee.file %> </td>
+        <td class="p-2">
+          <div class="px-2 bg-blue-500 text-white cursor-pointer rounded">
+            <%= link_to "Editar", employee %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
 <%= link_to "Adicionar colaborador", new_employee_path %>
