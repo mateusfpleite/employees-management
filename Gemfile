@@ -33,6 +33,9 @@ gem "solid_cable"
 
 gem 'simple_form'
 
+gem 'caxlsx'
+gem 'axlsx_rails'
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 

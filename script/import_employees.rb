@@ -5,17 +5,17 @@ folder_path = "/home/mateus/Downloads/planilhas_csv"
 all_employees = []
 
 def normalize_role(role)
-  base_role = role
-  if role.include?("coord")
-    base_role = role.gsub(/coord(\.|$)/, "coordenador")
+  base_role = role.downcase.strip
+  if base_role.include?("coord")
+    base_role = base_role.gsub(/\bcoord\.?\b/i, "coordenador").gsub('.', '')
   end
-  if role.include?("aux")
-    base_role = role.gsub(/aux(\.|$)/, "auxiliar")
+  if base_role.include?("aux")
+    base_role = base_role.gsub(/\baux\.?\b/i, "auxiliar")
   end
-  if role.include?("louge")
-    base_role = role.gsub(/louge/, "lounge")
+  if base_role.include?("louge")
+    base_role = base_role.gsub(/louge/, "lounge")
   end
-  base_role.strip.downcase
+  base_role
 end
 
 
@@ -37,7 +37,7 @@ end
 
 
 def add_employee_role_if_not_exists(employee, role)
-  employee["role"] << normalize_role(role) unless employee["role"].include?(role.strip.downcase)
+  employee["role"] << normalize_role(role) unless employee["role"].include?(normalize_role(role))
 end
 
 # Iterate through each file in the folder

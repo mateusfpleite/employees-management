@@ -1,0 +1,13 @@
+xlsx_package.workbook.add_worksheet(name: "Employees") do |sheet|
+  sheet.add_row ["Nome", "Documento", "Função"]
+
+  # If @employees_to_export is empty, we could default to @employees
+  # or show nothing. Adjust as needed.
+  (@employees_to_export.presence || @employees).each do |employee|
+    sheet.add_row [
+      employee.name,
+      employee.document,
+      employee.role.join(", ")
+    ]
+  end
+end

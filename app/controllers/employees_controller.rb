@@ -1,8 +1,18 @@
 class EmployeesController < ApplicationController
   before_action :set_employee, only: %i[ show edit update destroy ]
 
-  # GET /employees or /employees.json
   def index
+    # Handle Export
+    if request.format.xlsx? && params[:employee_ids].present?
+      @employees_to_export = Employee.where(id: params[:employee_ids])
+      respond_to do |format|
+        format.html
+        format.xlsx { render xlsx: "index", filename: "funcionarios.xlsx" }
+      end
+      return
+    end
+
+    # Handle Search
     if params[:search] && params[:search][:name].present?
       name_to_lower = remove_special_characters(params[:search][:name].downcase)
       @employees = Employee.where("unaccent(LOWER(name)) LIKE ?", "%#{name_to_lower}%")
@@ -12,71 +22,42 @@ class EmployeesController < ApplicationController
   end
 
   def remove_special_characters(string)
-    string_without_accents = I18n.transliterate(string).strip;
-    # string_without_accents.gsub(/[^0-9a-z ]/i, '').strip
-    string_without_accents
+    I18n.transliterate(string).strip
   end
 
+  def show; end
+  def new; @employee = Employee.new; end
+  def edit; end
 
-  # GET /employees/1 or /employees/1.json
-  def show
-  end
-
-  # GET /employees/new
-  def new
-    @employee = Employee.new
-  end
-
-  # GET /employees/1/edit
-  def edit
-  end
-
-  # POST /employees or /employees.json
   def create
     @employee = Employee.new(employee_params)
-
-    respond_to do |format|
-      if @employee.save
-        format.html { redirect_to @employee, notice: "Employee was successfully created." }
-        format.json { render :show, status: :created, location: @employee }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @employee.errors, status: :unprocessable_entity }
-      end
+    if @employee.save
+      redirect_to @employee, notice: "Employee was successfully created."
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /employees/1 or /employees/1.json
   def update
-    respond_to do |format|
-      if @employee.update(employee_params)
-        format.html { redirect_to @employee, notice: "Employee was successfully updated." }
-        format.json { render :show, status: :ok, location: @employee }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @employee.errors, status: :unprocessable_entity }
-      end
+    if @employee.update(employee_params)
+      redirect_to @employee, notice: "Employee was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /employees/1 or /employees/1.json
   def destroy
     @employee.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to employees_path, status: :see_other, notice: "Employee was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to employees_path, status: :see_other, notice: "Employee was successfully destroyed."
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_employee
-      @employee = Employee.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def employee_params
-      params.expect(employee: [ :name, :role, :document ])
-    end
+  def set_employee
+    @employee = Employee.find(params[:id])
+  end
+
+  def employee_params
+    params.require(:employee).permit(:name, :role, :document)
+  end
 end

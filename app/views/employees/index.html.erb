@@ -1,47 +1,75 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Funcionários" %>
 
-<h1 class="font-extrabold text-2xl">Funcionários</h1>
+<div class="flex justify-between">
+  <h1 class="font-extrabold text-2xl">Funcionários</h1>
+  <%= link_to "Adicionar colaborador", new_employee_path, class: 'inline-block px-4 py-2 bg-green-600 text-white rounded' %>
+</div>
 
 <%= simple_form_for :search, url: employees_path, method: :get, html: { class: 'mb-4' } do |f| %>
-  <div class="flex items-end">
-    <%= f.input :name, label: 'Buscar por Nome', placeholder: 'Digite o nome do colaborador', input_html: { value: params[:search]&.dig(:name), class: 'form-input w-full' } %>
+  <% selected_ids = params[:employee_ids] || [] %>
+
+  <!-- Hidden fields to preserve previously selected employee_ids -->
+  <% selected_ids.each do |eid| %>
+    <%= hidden_field_tag 'employee_ids[]', eid %>
+  <% end %>
+
+  <div class="flex items-end mb-4">
+    <%= f.input :name,
+                label: false,
+                placeholder: 'Digite o nome do funcionário',
+                required: false,
+                input_html: { value: params[:search]&.dig(:name), class: 'form-input w-full' } %>
+
     <%= f.button :submit, 'Buscar', class: 'cursor-pointer ml-2 px-4 py-2 bg-blue-500 text-white rounded' %>
     <%= link_to 'Limpar', employees_path, class: 'ml-2 px-4 py-2 bg-gray-300 text-black rounded' %>
   </div>
+
+  <table id="employees" class="table table-auto w-full">
+    <thead>
+      <tr>
+        <th class="text-left"></th>
+        <th class="text-left">Nome</th>
+        <th class="text-left">Cargo</th>
+        <th class="text-left">Documento</th>
+        <th class="text-left">Arquivo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @employees.each do |employee| %>
+        <tr class="mb-3">
+          <td class="p-2">
+            <!-- If employee is currently visible, show a checkbox.
+                 Mark it checked if it's already in selected_ids. -->
+            <%= check_box_tag 'employee_ids[]',
+                              employee.id,
+                              selected_ids.include?(employee.id.to_s),
+                              class: 'form-checkbox' %>
+          </td>
+          <td class="p-2"><%= employee.name %></td>
+          <td class="p-2">
+            <% employee.role.each do |role| %>
+              <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded mr-1"><%= role %></span>
+            <% end %>
+          </td>
+          <td class="p-2"><%= employee.document %></td>
+          <td class="p-2"><%= employee.file %></td>
+          <td class="p-2">
+            <div class="px-2 bg-blue-500 text-white cursor-pointer rounded">
+              <%= link_to "Editar", employee %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <!-- Export button with same form.
+       This will now send both search parameters and all employee_ids[] hidden fields. -->
+  <%= f.button :submit, 'Exportar para excel',
+               name: nil,
+               value: nil,
+               formmethod: :get,
+               formaction: employees_path(format: :xlsx),
+               class: 'cursor-pointer mt-4 px-4 py-2 bg-blue-500 text-white rounded' %>
 <% end %>
 
-
-<table id="employees" class="table table-auto">
-  <thead>
-    <tr>
-      <th class="text-left">Nome</th>
-      <th class="text-left">Cargo</th>
-      <th class="text-left">Documento</th>
-      <th class="text-left">Arquivo</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @employees.each do |employee| %>
-      <tr class="mb-3">
-        <td class="p-2"><%= employee.name %></td>
-        <td class="p-2">
-          <% employee.role.each do |role|  %>
-            <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded mr-1"><%= role %></span>
-          <% end %>
-        </td>
-        <td class="p-2"><%= employee.document %></td>
-        <td class="p-2"><%= employee.file %> </td>
-        <td class="p-2">
-          <div class="px-2 bg-blue-500 text-white cursor-pointer rounded">
-            <%= link_to "Editar", employee %>
-          </div>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<%= link_to "Adicionar colaborador", new_employee_path %>

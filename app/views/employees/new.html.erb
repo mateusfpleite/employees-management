@@ -1,11 +1,11 @@
-<% content_for :title, "Novo colaborador" %>
+<% content_for :title, "Novo funcionário" %>
 
-<h1>Novo colaborador</h1>
+<h1 class="font-extrabold text-2xl mb-3">Novo funcionário</h1>
 
 <%= render "form", employee: @employee %>
 
 <br>
 
 <div>
-  <%= link_to "Voltar à lista de colaboradores", employees_path %>
+  <%= link_to "Voltar à lista de funcionários", employees_path %>
 </div>

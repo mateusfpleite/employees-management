@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :employees
+  resources :employees do
+    # route to export xlsx
+    collection do
+      get :export_xlsx # /employees/export_xlsx
+    end
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
