@@ -19,6 +19,14 @@
                 placeholder: 'Digite o nome do funcionário',
                 required: false,
                 input_html: { value: params[:search]&.dig(:name), class: 'form-input w-full' } %>
+    
+    <%= f.input :role,
+                collection: Employee.all.map(&:role).flatten.uniq,
+                class: "mr-2",
+                label: false,
+                include_blank: 'Selecione um cargo',
+                selected: params[:search]&.dig(:role),
+                input_html: { class: 'form-select w-full ml-2 mr-2' } %>
 
     <%= f.button :submit, 'Buscar', class: 'cursor-pointer ml-2 px-4 py-2 bg-blue-500 text-white rounded' %>
     <%= link_to 'Limpar', employees_path, class: 'ml-2 px-4 py-2 bg-gray-300 text-black rounded' %>

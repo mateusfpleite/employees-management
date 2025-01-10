@@ -12,10 +12,12 @@ class EmployeesController < ApplicationController
       return
     end
 
-    # Handle Search
-    if params[:search] && params[:search][:name].present?
+    if params[:search] && (params[:search][:name].present? || params[:search][:role].present?)
       name_to_lower = remove_special_characters(params[:search][:name].downcase)
       @employees = Employee.where("unaccent(LOWER(name)) LIKE ?", "%#{name_to_lower}%")
+      role_to_lower = remove_special_characters(params[:search][:role].downcase)
+      @employees = @employees.where("role @> ARRAY[?]::varchar[]", [role_to_lower]) if role_to_lower.present?
+
     else
       @employees = Employee.all
     end
