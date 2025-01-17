@@ -21,6 +21,7 @@ class EmployeesController < ApplicationController
     else
       @employees = Employee.all
     end
+    @employees = @employees.order(:name)
   end
 
   def remove_special_characters(string)
